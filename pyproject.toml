@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yahoo-finance-sentiment-bot"
+version = "0.1.0"
+description = "Yahoo Taiwan Finance RSS target-based sentiment research CLI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+ml = [
+  "joblib>=1.4",
+  "numpy>=2.0",
+  "scikit-learn>=1.5",
+  "torch>=2.10",
+  "transformers>=5.0",
+]
+dev = [
+  "pytest>=8.3",
+  "ruff>=0.11",
+]
+
+[project.scripts]
+yfsent = "yfsent.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/yfsent"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+

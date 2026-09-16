@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Yahoo股市 - 測試</title>
+    <item>
+      <title>聯電失去大客戶訂單，台積電可望受惠</title>
+      <description><![CDATA[<p>市場預期台積電營收將成長。</p>]]></description>
+      <link>https://tw.stock.yahoo.com/news/example-1.html</link>
+      <guid>example-1</guid>
+      <pubDate>Wed, 16 Sep 2026 08:00:00 +0800</pubDate>
+      <source>測試財經網</source>
+    </item>
+    <item>
+      <title>台積電董事會通過例行議案</title>
+      <description>公司今日公告董事會決議。</description>
+      <link>https://tw.stock.yahoo.com/news/example-2.html</link>
+      <guid>example-2</guid>
+    </item>
+  </channel>
+</rss>
+
