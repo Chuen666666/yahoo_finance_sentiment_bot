@@ -80,7 +80,7 @@ yfsent export-labels --query 台積電 --limit 500 --output data/labels.csv
 以 Excel 或試算表填寫以下欄位：
 
 - `sentiment`：只能填 `positive`、`negative` 或 `neutral`。
-- `evidence_text`：直接複製支援判斷的原文；中立資料可以留空。
+- `evidence_text`：直接複製支持判斷的原文；中立資料可以留空。
 - `notes`：選填，用來記錄難以判定或語意相反的案例。
 
 判斷對象是 `entity_name` 指定的公司，不是整篇新聞的語氣。例如「聯電失單，台積電受惠」對聯電是 `negative`，對台積電是 `positive`。
