@@ -34,6 +34,18 @@ class TextTests(unittest.TestCase):
         result = target_context("台積電營收成長", TSMC)
         self.assertIn("目標公司營收成長", result)
 
+    def test_target_context_keeps_target_window_only(self) -> None:
+        text = "大盤今日上漲。聯發科創新高。台積電召開法說會。法人關注展望。美元走弱。"
+        result = target_context(text, TSMC, require_mention=True)
+        self.assertNotIn("大盤今日上漲", result)
+        self.assertIn("聯發科創新高", result)
+        self.assertIn("目標公司召開法說會", result)
+        self.assertIn("法人關注展望", result)
+        self.assertNotIn("美元走弱", result)
+
+    def test_target_context_can_require_explicit_mention(self) -> None:
+        self.assertEqual(target_context("大盤今日上漲", TSMC, require_mention=True), "")
+
     def test_extract_exact_evidence(self) -> None:
         text = "聯電失單，台積電可望受惠。"
         evidence = EvidenceExtractor().extract(
@@ -53,4 +65,3 @@ class TextTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

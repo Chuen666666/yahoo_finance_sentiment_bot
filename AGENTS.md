@@ -4,7 +4,7 @@
 
 ## 專案目標
 
-這是一個個人、非商業研究用的 Python CLI：讀取 Yahoo 股市官方 RSS，辨識其中提到的台灣上市櫃公司，針對每家公司分別判斷市場語意為 `positive`、`negative` 或 `neutral`，並輸出支持判斷的原文片段。
+這是一個個人、非商業研究用的 Python CLI 與獨立 Web 應用：讀取 Yahoo 股市官方 RSS，辨識其中提到的台灣上市櫃公司，針對每家公司分別判斷市場語意為 `positive`、`negative`、`neutral` 或需人工複核的 `uncertain`，並輸出支持判斷的原文片段。
 
 第一版只處理 RSS 提供的標題與摘要。除非使用者明確提供合法授權的資料來源，否則不得新增 Yahoo 新聞全文、文章留言或個股留言板爬蟲，也不得規避登入、robots、流量限制或其他存取控制。
 
@@ -20,7 +20,7 @@
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -e ".[ml,dev]"
+pip install -e ".[ml,web,dev]"
 
 python -m ruff check src tests
 python -m unittest discover -s tests -v
@@ -30,6 +30,8 @@ python -m compileall -q src tests
 ## 主要模組
 
 - `src/yfsent/cli.py`：命令列介面與流程協調。
+- `src/yfsent/analysis.py`：CLI 與 Web 共用的目標公司情緒分析管線。
+- `src/yfsent/web.py`：FastAPI、新聞列表頁、手動更新與自動追蹤排程。
 - `src/yfsent/feeds.py`：Yahoo 官方 RSS 取得、解析、清理與去重。
 - `src/yfsent/entities.py`：TWSE／TPEx 公司資料同步、別名與實體辨識。
 - `src/yfsent/database.py`：SQLite schema 與資料存取。
@@ -73,6 +75,7 @@ python -m compileall -q src tests
 
 - 優先修改既有模組，不要建立功能重疊的新入口或第二套資料模型。
 - 對外 CLI 參數、CSV 欄位或 SQLite schema 有變更時，同步更新 README、測試與必要的遷移／相容處理。
+- Web 預設僅監聽 localhost；加入驗證、CSRF／濫用防護與部署設定前，不得預設公開監聽。
 - 錯誤訊息使用清楚的繁體中文，技術欄位與固定標籤維持英文。
 - 保持型別提示與小型純函式；外部 I/O 和文字／模型邏輯應分離，方便離線測試。
 - 不修改工作區內與本專案無關的檔案。

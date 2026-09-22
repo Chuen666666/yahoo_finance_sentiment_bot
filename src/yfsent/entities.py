@@ -104,7 +104,13 @@ class EntityResolver:
         self.alias_to_code = {
             alias: next(iter(codes)) for alias, codes in alias_to_codes.items() if len(codes) == 1
         }
-        self.aliases = sorted(self.alias_to_code, key=lambda value: (-len(value), value))
+        # Bare four-digit codes are indistinguishable from years and financial amounts
+        # in general news. Codes remain valid for resolve_query(), while mention
+        # detection relies on company names and non-numeric aliases.
+        self.aliases = sorted(
+            (alias for alias in self.alias_to_code if not alias.isdigit()),
+            key=lambda value: (-len(value), value),
+        )
 
     def resolve_query(self, query: str) -> Entity | None:
         normalized = query.strip()
@@ -137,9 +143,11 @@ class EntityResolver:
         seen_entities: set[str] = set()
         for mention in candidates:
             overlaps = any(mention.start < end and mention.end > start for start, end in occupied)
-            if overlaps or mention.entity.code in seen_entities:
+            if overlaps:
+                continue
+            occupied.append((mention.start, mention.end))
+            if mention.entity.code in seen_entities:
                 continue
             selected.append(mention)
-            occupied.append((mention.start, mention.end))
             seen_entities.add(mention.entity.code)
         return sorted(selected, key=lambda mention: mention.start)

@@ -4,7 +4,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 data/*.db
+data/labels*.csv
 data/raw/
+data/auxiliary/
 data/output/
 artifacts/
-

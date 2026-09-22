@@ -20,9 +20,16 @@ class ClassifierError(RuntimeError):
 
 
 class TfidfClassifier:
-    def __init__(self, pipeline: object, *, version: str = "tfidf-char-v1") -> None:
+    def __init__(
+        self,
+        pipeline: object,
+        *,
+        version: str = "tfidf-char-v1",
+        confidence_threshold: float = 0.55,
+    ) -> None:
         self.pipeline = pipeline
         self.version = version
+        self.confidence_threshold = confidence_threshold
 
     def predict_proba(self, texts: list[str]) -> list[dict[str, float]]:
         probabilities = self.pipeline.predict_proba(texts)
@@ -53,6 +60,7 @@ class FinBertClassifier:
         self.model_id = model_id
         self.batch_size = batch_size
         self.version = f"finbert:{model_id}"
+        self.confidence_threshold = 0.55
 
     def predict_proba(self, texts: list[str]) -> list[dict[str, float]]:
         output: list[dict[str, float]] = []
@@ -91,7 +99,11 @@ def load_classifier(model_path: str | Path) -> TfidfClassifier | FinBertClassifi
     bundle = joblib.load(path)
     kind = bundle.get("kind")
     if kind == "tfidf":
-        return TfidfClassifier(bundle["pipeline"], version=bundle.get("version", "tfidf-char-v1"))
+        return TfidfClassifier(
+            bundle["pipeline"],
+            version=bundle.get("version", "tfidf-char-v1"),
+            confidence_threshold=float(bundle.get("confidence_threshold", 0.55)),
+        )
     if kind == "finbert":
         return FinBertClassifier(bundle.get("model_id", FINBERT_MODEL_ID))
     raise ClassifierError(f"不支援的模型格式：{kind!r}")

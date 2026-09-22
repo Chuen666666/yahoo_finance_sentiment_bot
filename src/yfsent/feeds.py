@@ -96,11 +96,16 @@ def parse_feed(payload: bytes, *, feed_url: str = "") -> list[ContentRecord]:
     return records
 
 
-def _matches_query(record: ContentRecord, query: str, target: Entity | None) -> bool:
+def matches_query(record: ContentRecord, query: str, target: Entity | None) -> bool:
     haystack = record.combined_text.casefold()
-    terms = {query.strip().casefold()}
+    normalized_query = query.strip().casefold()
+    terms = {normalized_query} if normalized_query and not normalized_query.isdigit() else set()
     if target:
-        terms.update(alias.casefold() for alias in target.aliases if len(alias) >= 2)
+        terms.update(
+            alias.casefold()
+            for alias in target.aliases
+            if len(alias) >= 2 and not alias.isdigit()
+        )
     return any(term and term in haystack for term in terms)
 
 
@@ -118,7 +123,7 @@ def fetch_for_query(
     deduplicated: dict[str, ContentRecord] = {}
     for url in urls:
         for record in parse_feed(get_bytes(url), feed_url=url):
-            if not local_filter or _matches_query(record, query, target):
+            if not local_filter or matches_query(record, query, target):
                 deduplicated[record.id] = record
     records = sorted(
         deduplicated.values(),

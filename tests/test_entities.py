@@ -50,6 +50,19 @@ class EntityTests(unittest.TestCase):
         resolver = EntityResolver([first, second])
         self.assertEqual(resolver.find_mentions("同名公司發布新聞"), [])
 
+    def test_repeated_long_alias_still_masks_shorter_company(self) -> None:
+        long_entity = Entity("3008", "TWSE", "大立光電股份有限公司", "大立光", ("大立光",))
+        short_entity = Entity("4716", "TWSE", "大立高分子工業股份有限公司", "大立", ("大立",))
+        resolver = EntityResolver([long_entity, short_entity])
+        mentions = resolver.find_mentions("大立光跌停後，大立光股價回穩")
+        self.assertEqual([mention.entity.code for mention in mentions], ["3008"])
+
+    def test_bare_numeric_code_is_queryable_but_not_a_mention(self) -> None:
+        entity = Entity("2025", "TWSE", "千興不銹鋼股份有限公司", "千興", ("千興", "2025"))
+        resolver = EntityResolver([entity])
+        self.assertEqual(resolver.resolve_query("2025"), entity)
+        self.assertEqual(resolver.find_mentions("截至 2025 年為止"), [])
+
 
 if __name__ == "__main__":
     unittest.main()

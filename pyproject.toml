@@ -20,8 +20,13 @@ ml = [
   "transformers>=5.0",
 ]
 dev = [
+  "httpx>=0.28",
   "pytest>=8.3",
   "ruff>=0.11",
+]
+web = [
+  "fastapi>=0.116",
+  "uvicorn>=0.35",
 ]
 
 [project.scripts]
@@ -40,4 +45,3 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-

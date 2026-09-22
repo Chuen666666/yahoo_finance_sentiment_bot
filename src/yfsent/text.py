@@ -53,16 +53,49 @@ def split_spans(text: str) -> list[tuple[str, int, int]]:
     return spans
 
 
-def target_context(text: str, entity: Entity) -> str:
-    aliases = sorted(
-        set(entity.aliases) | {entity.name, entity.short_name, entity.code},
-        key=len,
-        reverse=True,
+def _text_aliases(entity: Entity) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            {
+                alias
+                for alias in (*entity.aliases, entity.name, entity.short_name)
+                if alias and not alias.isdigit()
+            },
+            key=len,
+            reverse=True,
+        )
     )
-    result = text
+
+
+def target_context(
+    text: str,
+    entity: Entity,
+    *,
+    window: int = 1,
+    require_mention: bool = False,
+) -> str:
+    """Return target clauses plus neighboring clauses, with target aliases masked."""
+    aliases = _text_aliases(entity)
+    spans = split_spans(text)
+    hit_indices = {
+        index
+        for index, (value, _, _) in enumerate(spans)
+        if any(re.search(re.escape(alias), value, re.IGNORECASE) for alias in aliases)
+    }
+    if hit_indices:
+        selected_indices = {
+            neighbor
+            for index in hit_indices
+            for neighbor in range(max(0, index - window), min(len(spans), index + window + 1))
+        }
+        result = "".join(spans[index][0] for index in sorted(selected_indices))
+    elif require_mention:
+        return ""
+    else:
+        result = text
+
     for alias in aliases:
-        if alias:
-            result = re.sub(re.escape(alias), "目標公司", result, flags=re.IGNORECASE)
+        result = re.sub(re.escape(alias), "目標公司", result, flags=re.IGNORECASE)
     return f"目標：{entity.short_name}。新聞：{result}"
 
 
@@ -89,8 +122,15 @@ class EvidenceExtractor:
         if label == "neutral":
             return ()
         clauses = split_spans(text)
-        entity_aliases = tuple(alias for alias in entity.aliases if alias)
-        relevant = [span for span in clauses if any(alias in span[0] for alias in entity_aliases)]
+        entity_aliases = _text_aliases(entity)
+        relevant = [
+            span
+            for span in clauses
+            if any(
+                re.search(re.escape(alias), span[0], re.IGNORECASE)
+                for alias in entity_aliases
+            )
+        ]
         candidates = relevant or clauses
 
         best = candidates[0] if candidates else (text, 0, len(text))

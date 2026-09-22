@@ -56,4 +56,6 @@ class SentimentResult:
     confidence: float
     evidence: tuple[EvidenceSpan, ...] = field(default_factory=tuple)
     model_version: str = ""
-
+    raw_label: str = ""
+    review_required: bool = False
+    target_mentioned: bool = True
