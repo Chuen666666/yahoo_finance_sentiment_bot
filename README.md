@@ -373,3 +373,9 @@ yfsent train `
 外部資料不會加入驗證折，因此 `metrics.json` 的分數仍反映 Yahoo 標註資料；
 `auxiliary_samples` 與 `auxiliary_class_counts` 會另外記錄實際加入訓練的數量。
 應分別訓練 Yahoo-only 與輔助資料版本，只有 Yahoo 驗證集指標確實改善時才採用外部資料。
+
+## 授權
+
+本專案程式碼採用 [MIT License](LICENSE) 授權。
+
+Yahoo、TWSE、TPEx、FinChina-SA，以及新聞原始媒體的內容、商標與資料，仍分別受其自身授權條款及權利規範約束，不因本專案採用 MIT License 而改變。
